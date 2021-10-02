@@ -1,4 +1,5 @@
 import sqlite3
+import gpx
 
 conn = sqlite3.connect(":memory:")
 curs = conn.cursor()
@@ -24,3 +25,6 @@ with conn:
 
 add_tour("My first run", "./gpx/my_first_run.gpx", 4.95, "run", 1633105270)
 print_tours()
+
+print(gpx.get_distance("gpx/test_run.gpx"))
+print(gpx.get_elevation("gpx/test_run.gpx"))
