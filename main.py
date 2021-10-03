@@ -1,30 +1,9 @@
-import sqlite3
 import gpx
+import sqlite
 
-conn = sqlite3.connect(":memory:")
-curs = conn.cursor()
-
-def add_tour(title, path, distance, type, date):
-    with conn:
-        curs.execute("INSERT INTO tours VALUES (:title, :path, :distance, :type, :date)",
-            {"title": title, "path": path, "distance": distance, "type": type, "date": date})
-
-def print_tours():
-    with conn:
-        curs.execute("SELECT * FROM tours")
-        print(curs.fetchall())
-
-with conn:
-    curs.execute("""CREATE TABLE tours (
-        title text,
-        path text,
-        distance real,
-        type text,
-        date int
-    )""")
-
-add_tour("My first run", "./gpx/my_first_run.gpx", 4.95, "run", 1633105270)
-print_tours()
+db = sqlite.SQLite(":memory:")
+db.add_tour("My first run", "gpx/test_run.gpx", 4.95, "run", 1633105270)
+db.print_tours()
 
 print(gpx.get_distance("gpx/test_run.gpx"))
 print(gpx.get_elevation("gpx/test_run.gpx"))
