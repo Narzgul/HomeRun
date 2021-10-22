@@ -1,25 +1,22 @@
 from datetime import datetime
-import re
+from os import write
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, request
+import json
 import gpx
 
-print(gpx.get_distance("gpx/test_run.gpx"))
-print(gpx.get_elevation("gpx/test_run.gpx"))
+#print(gpx.get_distance("gpx/test_run.gpx"))
+#print(gpx.get_elevation("gpx/test_run.gpx"))
 
 app = Flask(__name__)
-
-
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tours.db'
 
 db = SQLAlchemy(app)
 class Tour(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(200), nullable=False)
+    title = db.Column(db.String(255), nullable=False)
     date = db.Column(db.DateTime, default=datetime.utcnow)
-    def __repr__(self):
-        return "Title: " + self.title
-
+    path = db.Column(db.String(255))
 
 @app.route("/")
 def index():
@@ -27,26 +24,16 @@ def index():
 
 @app.route("/api", methods=['POST'])
 def api_page():
-    if request.method == 'POST':
-        request_data = request.get_json()
-        print(request_data)
-        title = request_data['title']
-        date = request_data['date']
-        print("Title: " + title)
-        print("Date: " + date)
-        return "recieved"
-    else:
-        return "invalid"
-
-@app.route("/api/file", methods=['POST'])
-def api_page_file():
-    if request.method == 'POST':
-        request_files = request.files.getlist('document')
-        print(request_files)
-        return "recieved"
-    else:
-        return "invalid"
+    title =  request.files['title'].read().decode('utf-8')
+    date = request.files['date'].read().decode('utf-8')
+    file = request.files['file'].read().decode('utf-8')
+    with open('./gpx/' + title + date, 'w') as file1:
+        file1.write(file)
+    Tour(title=title, date=date)
+    print("Title: "+ title)
+    print("Date: "+ date)
+    print(file)
+    return "recieved"
 
 if __name__ == "__main__":
     app.run(port = 1337, debug=True)
-
