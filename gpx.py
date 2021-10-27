@@ -30,17 +30,25 @@ def get_distance(path):
 
     return total_dis
 
-def get_elevation(path):
+def get_elevation(path, positive=True):
     total_ele = 0
     tmp_point = None
 
     gpx_file = open(path, "r")
     tour = gpxpy.parse(gpx_file)
-    for track in tour.tracks:
-        for segment in track.segments:
-            for point in segment.points:
-                if tmp_point is None: tmp_point = point
-                if point.elevation > tmp_point.elevation: total_ele += point.elevation - tmp_point.elevation
-                tmp_point = point
+    if positive:
+        for track in tour.tracks:
+            for segment in track.segments:
+                for point in segment.points:
+                    if tmp_point is None: tmp_point = point
+                    if point.elevation > tmp_point.elevation: total_ele += point.elevation - tmp_point.elevation
+                    tmp_point = point
+    else:
+        for track in tour.tracks:
+            for segment in track.segments:
+                for point in segment.points:
+                    if tmp_point is None: tmp_point = point
+                    if point.elevation < tmp_point.elevation: total_ele += point.elevation - tmp_point.elevation
+                    tmp_point = point
 
     return total_ele
